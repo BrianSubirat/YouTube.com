@@ -1,0 +1,1197 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube Clone</title>
+  <style>
+    :root {
+      --yt-red: #ff0000;
+      --yt-dark: #0f0f0f;
+      --yt-text: #f1f1f1;
+      --yt-gray: #272727;
+      --yt-button: #3ea6ff;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Roboto", sans-serif;
+      background: var(--yt-dark);
+      color: var(--yt-text);
+      min-height: 100vh;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem;
+      background: rgba(15, 15, 15, 0.95);
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 100;
+      box-sizing: border-box;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      backdrop-filter: blur(10px);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      text-decoration: none;
+      color: var(--yt-text);
+      min-width: 90px;
+    }
+
+    .logo svg {
+      height: 20px;
+    }
+
+    @media (max-width: 640px) {
+      .logo span {
+        display: none;
+      }
+      
+      .logo {
+        min-width: unset;
+      }
+    }
+
+    .search-container {
+      display: flex;
+      align-items: center;
+      max-width: 600px;
+      width: 50%;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    @media (max-width: 768px) {
+      .search-container {
+        width: 60%;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .search-container {
+        width: 50%;
+      }
+      
+      .search-bar {
+        font-size: 14px !important;
+      }
+    }
+
+    .search-bar {
+      width: 100%;
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--yt-gray);
+      border-radius: 20px 0 0 20px;
+      background: var(--yt-dark);
+      color: var(--yt-text);
+      font-size: 16px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-bar:focus {
+      border-color: #1c62b9;
+    }
+
+    .search-button {
+      padding: 0.5rem;
+      width: 50px;
+      background: var(--yt-gray);
+      border: 1px solid var(--yt-gray);
+      border-radius: 0 20px 20px 0;
+      color: var(--yt-text);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .search-button:hover {
+      background: #3d3d3d;
+    }
+
+    .sign-in-button {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: transparent;
+      border: 1px solid var(--yt-button);
+      color: var(--yt-button);
+      padding: 6px 12px;
+      border-radius: 18px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 480px) {
+      .sign-in-button span {
+        display: none;
+      }
+    }
+
+    .sign-in-button:hover {
+      background: rgba(62, 166, 255, 0.1);
+    }
+
+    .sign-in-button svg {
+      width: 24px;
+      height: 24px;
+      fill: var(--yt-button);
+    }
+
+    .create-button {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: transparent; 
+      padding: 6px 12px;
+      border: none;
+      color: var(--yt-text);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .create-button:hover {
+      background: var(--yt-gray);
+      border-radius: 50%;
+    }
+
+    .shorts-button {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: transparent;
+      border: none;
+      color: var(--yt-text);
+      cursor: pointer;
+      font-size: 14px;
+      border-radius: 20px;
+      transition: background 0.2s;
+      margin-right: 12px;
+    }
+
+    .shorts-button:hover {
+      background: var(--yt-gray);
+    }
+
+    .shorts-button svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    .content {
+      margin-top: 60px;
+      padding: 1rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1rem;
+    }
+
+    @media (max-width: 640px) {
+      .content {
+        grid-template-columns: 1fr;
+        padding: 0.5rem;
+      }
+    }
+
+    .video-card {
+      background: var(--yt-gray);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+      position: relative;
+      transform: translateY(0);
+    }
+
+    .video-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    .thumbnail {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: #333;
+      position: relative;
+      background-size: cover;
+      background-position: center;
+      transition: transform 0.3s ease;
+      border-radius: 12px 12px 0 0;
+    }
+
+    .video-card:hover .thumbnail {
+      transform: scale(1.02);
+    }
+
+    .duration {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      backdrop-filter: blur(4px);
+    }
+
+    .video-info {
+      padding: 12px;
+    }
+
+    .video-title {
+      font-weight: 500;
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .channel-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      color: #aaa;
+      margin-bottom: 4px;
+    }
+
+    .channel-avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #555;
+      background-size: cover;
+      cursor: pointer;
+    }
+
+    .stats {
+      display: flex;
+      gap: 0.5rem;
+      color: #aaa;
+      font-size: 0.75rem;
+    }
+
+    @keyframes pulse {
+      0% { background-position: -100% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    .loading {
+      background: linear-gradient(90deg, var(--yt-gray) 25%, #333 50%, var(--yt-gray) 75%);
+      background-size: 200% 100%;
+      animation: pulse 1.5s infinite;
+    }
+
+    .shorts-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      display: none;
+      z-index: 2000;
+      flex-direction: column;
+    }
+
+    .shorts-container.active {
+      display: flex;
+    }
+
+    .shorts-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      background: transparent;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 2001;
+    }
+
+    .shorts-title {
+      color: white;
+      font-size: 20px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .shorts-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .shorts-player {
+      width: 100%;
+      max-width: 400px;
+      height: calc(100vh - 100px);
+      background: #000;
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    @media (max-width: 768px) {
+      .shorts-player {
+        max-width: 100%;
+        height: 100vh;
+        border-radius: 0;
+      }
+    }
+
+    .shorts-controls {
+      position: absolute;
+      right: 16px;
+      bottom: 100px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      color: white;
+      z-index: 2002;
+    }
+
+    .shorts-control-button {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .shorts-control-button:hover {
+      transform: scale(1.1);
+    }
+
+    .shorts-control-button svg {
+      width: 28px;
+      height: 28px;
+      fill: currentColor;
+    }
+
+    .shorts-control-button span {
+      font-size: 12px;
+    }
+
+    .video-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.98);
+      display: none;
+      z-index: 1000;
+      padding: 40px;
+      box-sizing: border-box;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .video-modal.active {
+      display: flex;
+      flex-direction: column;
+      opacity: 1;
+    }
+
+    .video-player-container {
+      position: relative;
+      width: 100%;
+      max-width: 1280px;
+      margin: 0 auto;
+      aspect-ratio: 16/9;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .video-player {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: #000;
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.6);
+      border: none;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      z-index: 1001;
+      padding: 8px;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(8px);
+      transition: all 0.2s ease;
+    }
+
+    .close-modal:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.1);
+    }
+
+    .video-details {
+      max-width: 1280px;
+      margin: 24px auto 0;
+      color: white;
+      width: 100%;
+      background: rgba(20, 20, 20, 0.95);
+      padding: 24px;
+      border-radius: 16px;
+      backdrop-filter: blur(20px);
+      transition: all 0.3s ease;
+    }
+
+    .video-title-modal {
+      font-size: 1.8rem;
+      margin-bottom: 16px;
+      line-height: 1.3;
+      font-weight: 500;
+    }
+
+    .video-channel {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .video-channel .channel-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #555;
+      background-size: cover;
+      cursor: pointer;
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      transition: border-color 0.2s ease;
+    }
+
+    .video-channel .channel-avatar:hover {
+      border-color: var(--yt-button);
+    }
+
+    .video-description {
+      color: #ddd;
+      white-space: pre-wrap;
+      line-height: 1.5;
+      font-size: 15px;
+    }
+
+    @media (max-width: 768px) {
+      .video-modal {
+        padding: 20px;
+      }
+      
+      .video-title-modal {
+        font-size: 1.4rem;
+      }
+      
+      .video-details {
+        padding: 16px;
+        margin-top: 16px;
+      }
+      
+      .close-modal {
+        top: 10px;
+        right: 10px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .video-modal {
+        padding: 10px;
+      }
+      
+      .video-details {
+        padding: 12px;
+      }
+      
+      .video-title-modal {
+        font-size: 1.2rem;
+      }
+      
+      .video-channel .channel-avatar {
+        width: 36px;
+        height: 36px;
+      }
+    }
+
+    .bottom-nav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: var(--yt-dark);
+      padding: 8px 0;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.3);
+      z-index: 1000;
+      backdrop-filter: blur(10px);
+    }
+
+    .bottom-nav-buttons {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+    }
+
+    .bottom-nav-button {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 8px 16px;
+      color: var(--yt-text);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .bottom-nav-button svg {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+    }
+
+    .bottom-nav-button:hover {
+      color: var(--yt-button);
+    }
+
+    @media (max-width: 768px) {
+      .bottom-nav {
+        display: block;
+      }
+
+      .content {
+        margin-bottom: 80px;
+      }
+
+      .header .create-button,
+      .header .shorts-button {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <a href="https://www.youtube.com" class="logo">
+    <svg viewBox="0 0 90 20" fill="currentColor">
+      <path d="M27.9727 3.12324C27.6435 1.89323 26.6768 0.926623 25.4468 0.597366C23.2197 2.24288e-07 14.285 0 14.285 0C14.285 0 5.35042 2.24288e-07 3.12323 0.597366C1.89323 0.926623 0.926623 1.89323 0.597366 3.12324C2.24288e-07 5.35042 0 10 0 10C0 10 2.24288e-07 14.6496 0.597366 16.8768C0.926623 18.1068 1.89323 19.0734 3.12323 19.4026C5.35042 20 14.285 20 14.285 20C14.285 20 23.2197 20 25.4468 19.4026C26.6768 19.0734 27.6435 18.1068 27.9727 16.8768C28.5701 14.6496 28.5701 10 28.5701 10C28.5701 10 28.5677 5.35042 27.9727 3.12324Z" fill="#FF0000"/>
+      <path d="M11.4253 14.2854L18.8477 10.0004L11.4253 5.71533V14.2854Z" fill="white"/>
+    </svg>
+    <span>YouTube</span>
+  </a>
+  
+  <div class="search-container">
+    <input type="text" class="search-bar" placeholder="Search">
+    <button class="search-button">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+        <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+      </svg>
+    </button>
+  </div>
+
+  <button class="create-button">
+    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+      <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4zM14 13h-3v3H9v-3H6v-2h3V8h2v3h3v2z"/>
+    </svg>
+  </button>
+
+  <button class="shorts-button" id="shorts-button">
+    <svg viewBox="0 0 24 24">
+      <path d="M10 14.65v-5.3L15 12l-5 2.65zm7.77-4.33c-.77-.32-1.2-.5-1.2-.5L18 9.06c1.84-.96 2.53-3.23 1.56-5.06s-3.24-2.53-5.07-1.56L6 6.94c-1.29.68-2.07 2.04-2 3.49.07 1.42.93 2.67 2.22 3.25.03.01 1.2.5 1.2.5L6 14.93c-1.83.97-2.53 3.24-1.56 5.07.97 1.83 3.24 2.53 5.07 1.56l8.5-4.5c1.29-.68 2.06-2.04 1.99-3.49-.07-1.42-.94-2.68-2.23-3.25zm-.23 5.86l-8.5 4.5c-1.34.71-3.01.2-3.72-1.14-.71-1.34-.2-3.01 1.14-3.72l2.04-1.08v-1.21l-.69-.28-1.11-.46c-.99-.41-1.65-1.35-1.7-2.41-.05-1.06.52-2.06 1.46-2.56l8.5-4.5c1.34-.71 3.01-.2 3.72 1.14.71 1.34.2 3.01-1.14 3.72L15.5 9.26v1.21l1.8.74c.99.41 1.65 1.35 1.7 2.41.05 1.06-.52 2.06-1.46 2.56z"/>
+    </svg>
+    <span>Shorts</span>
+  </button>
+
+  <button class="sign-in-button">
+    <svg viewBox="0 0 24 24">
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+    </svg>
+    <span>Sign in</span>
+  </button>
+</header>
+
+<nav class="bottom-nav">
+  <div class="bottom-nav-buttons">
+    <button class="bottom-nav-button" id="home-button">
+      <svg viewBox="0 0 24 24">
+        <path d="M12 4.33l7 6.12V20h-4v-6H9v-3H6v-2h3V8h2v3h3v2z"/>
+      </svg>
+      <span>Home</span>
+    </button>
+    
+    <button class="bottom-nav-button" id="mobile-shorts-button">
+      <svg viewBox="0 0 24 24">
+        <path d="M10 14.65v-5.3L15 12l-5 2.65zm7.77-4.33c-.77-.32-1.2-.5-1.2-.5L18 9.06c1.84-.96 2.53-3.23 1.56-5.06s-3.24-2.53-5.07-1.56L6 6.94c-1.29.68-2.07 2.04-2 3.49.07 1.42.93 2.67 2.22 3.25.03.01 1.2.5 1.2.5L6 14.93c-1.83.97-2.53 3.24-1.56 5.07.97 1.83 3.24 2.53 5.07 1.56l8.5-4.5c1.29-.68 2.06-2.04 1.99-3.49-.07-1.42-.94-2.68-2.23-3.25zm-.23 5.86l-8.5 4.5c-1.34.71-3.01.2-3.72-1.14-.71-1.34-.2-3.01 1.14-3.72l2.04-1.08v-1.21l-.69-.28-1.11-.46c-.99-.41-1.65-1.35-1.7-2.41-.05-1.06.52-2.06 1.46-2.56l8.5-4.5c1.34-.71 3.01-.2 3.72 1.14.71 1.34.2 3.01-1.14 3.72L15.5 9.26v1.21l1.8.74c.99.41 1.65 1.35 1.7 2.41.05 1.06-.52 2.06-1.46 2.56z"/>
+      </svg>
+      <span>Shorts</span>
+    </button>
+    
+    <button class="bottom-nav-button" id="mobile-create-button">
+      <svg viewBox="0 0 24 24">
+        <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4zM14 13h-3v3H9v-3H6v-2h3V8h2v3h3v2z"/>
+      </svg>
+      <span>Create</span>
+    </button>
+    
+    <button class="bottom-nav-button" id="mobile-profile-button">
+      <svg viewBox="0 0 24 24">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+      </svg>
+      <span>Profile</span>
+    </button>
+  </div>
+</nav>
+
+<div class="shorts-container" id="shorts-container">
+  <div class="shorts-header">
+    <div class="shorts-title">
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+        <path d="M10 14.65v-5.3L15 12l-5 2.65zm7.77-4.33c-.77-.32-1.2-.5-1.2-.5L18 9.06c1.84-.96 2.53-3.23 1.56-5.06s-3.24-2.53-5.07-1.56L6 6.94c-1.29.68-2.07 2.04-2 3.49.07 1.42.93 2.67 2.22 3.25.03.01 1.2.5 1.2.5L6 14.93c-1.83.97-2.53 3.24-1.56 5.07.97 1.83 3.24 2.53 5.07 1.56l8.5-4.5c1.29-.68 2.06-2.04 1.99-3.49-.07-1.42-.94-2.68-2.23-3.25zm-.23 5.86l-8.5 4.5c-1.34.71-3.01.2-3.72-1.14-.71-1.34-.2-3.01 1.14-3.72l2.04-1.08v-1.21l-.69-.28-1.11-.46c-.99-.41-1.65-1.35-1.7-2.41-.05-1.06.52-2.06 1.46-2.56l8.5-4.5c1.34-.71 3.01-.2 3.72 1.14.71 1.34.2 3.01-1.14 3.72L15.5 9.26v1.21l1.8.74c.99.41 1.65 1.35 1.7 2.41.05 1.06-.52 2.06-1.46 2.56z"/>
+      </svg>
+      Shorts
+    </div>
+    <button class="close-modal" id="close-shorts">✕</button>
+  </div>
+  <div class="shorts-content">
+    <div class="shorts-player" id="shorts-player"></div>
+    <div class="shorts-controls">
+      <div class="shorts-control-button">
+        <svg viewBox="0 0 24 24">
+          <path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/>
+        </svg>
+        <span>Like</span>
+      </div>
+      <div class="shorts-control-button">
+        <svg viewBox="0 0 24 24">
+          <path d="M22 4c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4V4zm-2 13.17L18.83 16H4V4h16v13.17z"/>
+        </svg>
+        <span>Comment</span>
+      </div>
+      <div class="shorts-control-button">
+        <svg viewBox="0 0 24 24">
+          <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92zm-.23 5.86l-8.5 4.5c-1.34.71-3.01.2-3.72-1.14-.71-1.34-.2-3.01 1.14-3.72l2.04-1.08v-1.21l-.69-.28-1.11-.46c-.99-.41-1.65-1.35-1.7-2.41-.05-1.06.52-2.06 1.46-2.56l8.5-4.5c1.34-.71 3.01-.2 3.72 1.14.71 1.34.2 3.01-1.14 3.72L15.5 9.26v1.21l1.8.74c.99.41 1.65 1.35 1.7 2.41.05 1.06-.52 2.06-1.46 2.56z"/>
+        </svg>
+        <span>Share</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main class="content" id="video-container">
+  <!-- Videos will be dynamically loaded here -->
+</main>
+
+<div class="profile-page" id="profile-page">
+  <div class="profile-header">
+    <div class="profile-avatar-container">
+      <div class="profile-avatar" id="profile-avatar"></div>
+      <input type="file" id="profile-pic-input" accept="image/*" class="profile-pic-input">
+      <label for="profile-pic-input" class="profile-pic-label">Change Photo</label>
+    </div>
+    <div class="profile-info">
+      <input type="text" id="username" placeholder="Username" class="profile-input">
+      <input type="text" id="display-name" placeholder="Display Name" class="profile-input">
+      <textarea id="channel-bio" placeholder="Channel bio..." class="profile-input bio-input"></textarea>
+      <div class="profile-stats">
+        <span>0 subscribers</span>
+        <span>0 videos</span>
+      </div>
+      <button class="profile-done-btn" id="profile-done">Done</button>
+    </div>
+  </div>
+</div>
+
+<div class="create-page" id="create-page">
+  <form class="create-form">
+    <div class="form-group">
+      <label>Title</label>
+      <input type="text" required>
+    </div>
+    <div class="form-group">
+      <label>Description</label>
+      <textarea rows="4" required></textarea>
+    </div>
+    <div class="form-group">
+      <label>Video File</label>
+      <input type="file" accept="video/*" required>
+    </div>
+    <button type="submit" class="upload-button">Upload Video</button>
+  </form>
+</div>
+
+<div class="video-modal" id="video-modal">
+  <button class="close-modal" id="close-modal">✕</button>
+  <div class="video-player-container">
+    <iframe class="video-player" id="video-player" frameborder="0" allowfullscreen></iframe>
+  </div>
+  <div class="video-details">
+    <h2 class="video-title-modal" id="modal-title"></h2>
+    <div class="video-channel" id="modal-channel"></div>
+    <div class="video-description" id="modal-description"></div>
+  </div>
+</div>
+
+<script>
+const API_KEY = 'AIzaSyDFko_ouqtmkabLfElMHTU_LAjD35EavUY';
+const BASE_API_URL = 'https://www.googleapis.com/youtube/v3';
+
+async function fetchVideos(searchQuery = '') {
+  try {
+    let endpoint = `${BASE_API_URL}/search?part=snippet&maxResults=20&key=${API_KEY}`;
+    if (searchQuery === 'shorts') {
+      endpoint += '&videoDuration=short&type=video';
+    } else if (searchQuery) {
+      endpoint += `&q=${encodeURIComponent(searchQuery)}`;
+    } else {
+      endpoint += '&chart=mostPopular&type=video';
+    }
+    const response = await fetch(endpoint);
+    const data = await response.json();
+    if (data.error) {
+      throw new Error(data.error.message);
+    }
+    const videoIds = data.items.map(item => item.id.videoId || item.id).join(',');
+    const contentDetailsEndpoint = `${BASE_API_URL}/videos?part=contentDetails,statistics&id=${videoIds}&key=${API_KEY}`;
+    const detailsResponse = await fetch(contentDetailsEndpoint);
+    const detailsData = await detailsResponse.json();
+    return data.items.map(item => {
+      const details = detailsData.items?.find(detail => detail.id === (item.id.videoId || item.id));
+      return {
+        ...item,
+        statistics: details?.statistics || {},
+        contentDetails: details?.contentDetails || {}
+      };
+    });
+  } catch (error) {
+    console.error('Error fetching videos:', error);
+    return [];
+  }
+}
+
+function formatDuration(duration) {
+  if (!duration) return '00:00';
+  const match = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
+  if (!match) return '00:00';
+  const hours = (match[1] || '').replace('H', '');
+  const minutes = (match[2] || '').replace('M', '');
+  const seconds = (match[3] || '').replace('S', '');
+  let formattedDuration = '';
+  if (hours) {
+    formattedDuration += `${hours.padStart(2, '0')}:`;
+  }
+  formattedDuration += `${(minutes || '0').padStart(2, '0')}:${(seconds || '0').padStart(2, '0')}`;
+  return formattedDuration;
+}
+
+function formatViewCount(count) {
+  if (!count) return '0 views';
+  count = parseInt(count);
+  if (count >= 1000000) {
+    return Math.floor(count / 1000000) + 'M views';
+  } else if (count >= 1000) {
+    return Math.floor(count / 1000) + 'K views';
+  }
+  return count + ' views';
+}
+
+function timeSince(date) {
+  const seconds = Math.floor((new Date() - new Date(date)) / 1000);
+  const intervals = {
+    year: 31536000,
+    month: 2592000,
+    week: 604800,
+    day: 86400,
+    hour: 3600,
+    minute: 60
+  };
+  for (let [unit, secondsInUnit] of Object.entries(intervals)) {
+    const interval = Math.floor(seconds / secondsInUnit);
+    if (interval >= 1) {
+      return interval + ' ' + unit + (interval === 1 ? '' : 's') + ' ago';
+    }
+  }
+  return 'just now';
+}
+
+function createVideoCard(video) {
+  const snippet = video.snippet || {};
+  const statistics = video.statistics || {};
+  const contentDetails = video.contentDetails || {};
+  const duration = formatDuration(contentDetails.duration);
+  return `
+    <div class="video-card" data-video-id="${video.id.videoId || video.id}">
+      <div class="thumbnail" style="background-image: url('${snippet.thumbnails?.high?.url || ''}')">
+        <span class="duration">${duration}</span>
+      </div>
+      <div class="video-info">
+        <div class="video-title">${snippet.title || ''}</div>
+        <div class="channel-info">
+          <div class="channel-avatar" ${userData.profilePicture && snippet.channelTitle === userData.displayName ? `style="background-image: url(${userData.profilePicture})"` : ''}></div>
+          <span>${snippet.channelTitle || ''}</span>
+        </div>
+        <div class="stats">
+          <span>${formatViewCount(statistics.viewCount)}</span>
+          <span>• ${timeSince(snippet.publishedAt)}</span>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function displayVideos(videos) {
+  const container = document.getElementById('video-container');
+  container.innerHTML = videos.map(video => createVideoCard(video)).join('');
+  
+  // Store the videos data for later use
+  window.currentVideos = videos;
+  
+  document.querySelectorAll('.video-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const videoId = card.dataset.videoId;
+      const videoData = window.currentVideos.find(v => (v.id.videoId || v.id) === videoId);
+      openVideoModal(videoId, videoData);
+    });
+  });
+}
+
+function openVideoModal(videoId, videoData) {
+  const modal = document.getElementById('video-modal');
+  const player = document.getElementById('video-player');
+  const modalTitle = document.getElementById('modal-title');
+  const modalChannel = document.getElementById('modal-channel');
+  const modalDescription = document.getElementById('modal-description');
+
+  // Set video player source
+  player.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+  
+  // Set video details
+  modalTitle.textContent = videoData.snippet.title;
+  modalChannel.innerHTML = `
+    <div class="channel-avatar" ${userData.profilePicture && videoData.snippet.channelTitle === userData.displayName ? 
+      `style="background-image: url(${userData.profilePicture})"` : ''}></div>
+    <span>${videoData.snippet.channelTitle}</span>
+  `;
+  modalDescription.textContent = videoData.snippet.description;
+
+  // Show modal
+  modal.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeVideoModal() {
+  const modal = document.getElementById('video-modal');
+  const player = document.getElementById('video-player');
+  
+  // Reset player
+  player.src = '';
+  
+  // Hide modal
+  modal.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+let isSignedIn = false;
+let currentPage = 'home';
+function showPage(pageId) {
+  document.getElementById('video-container').style.display = 'none';
+  document.getElementById('profile-page').style.display = 'none';
+  document.getElementById('create-page').style.display = 'none';
+  document.getElementById(pageId).style.display = pageId === 'video-container' ? 'grid' : 'block';
+  currentPage = pageId;
+}
+
+function validateProfile() {
+  const username = document.getElementById('username').value.trim();
+  const displayName = document.getElementById('display-name').value.trim();
+  const bio = document.getElementById('channel-bio').value.trim();
+  if (!username || !displayName) {
+    alert('Please fill in both username and display name');
+    return false;
+  }
+  userData.username = username;
+  userData.displayName = displayName;
+  userData.channelBio = bio;
+  return true;
+}
+
+function handleSignIn() {
+  if (!isSignedIn) {
+    isSignedIn = true;
+    signInButton.innerHTML = `
+      <div class="channel-avatar" style="width: 24px; height: 24px; ${userData.profilePicture ? `background-image: url(${userData.profilePicture})` : ''}"></div>
+    `;
+    showPage('profile-page');
+  }
+}
+
+const searchBar = document.querySelector('.search-bar');
+const searchButton = document.querySelector('.search-button');
+const signInButton = document.querySelector('.sign-in-button');
+
+async function performSearch() {
+  const query = searchBar.value.trim();
+  if (query) {
+    const videos = await fetchVideos(query);
+    displayVideos(videos);
+  }
+}
+
+searchButton.addEventListener('click', performSearch);
+searchBar.addEventListener('keypress', e => {
+  if (e.key === 'Enter') {
+    performSearch();
+  }
+});
+signInButton.addEventListener('click', handleSignIn);
+
+function initShorts() {
+  const shortsButton = document.getElementById('shorts-button');
+  const shortsContainer = document.getElementById('shorts-container');
+  const closeShorts = document.getElementById('close-shorts');
+  const shortsPlayer = document.getElementById('shorts-player');
+  let currentShortIndex = 0;
+  let shortsVideos = [];
+  let touchStartY = 0;
+  let touchEndY = 0;
+
+  async function loadShorts() {
+    shortsVideos = await fetchVideos('shorts');
+    if (shortsVideos.length > 0) {
+      playShort(currentShortIndex);
+    }
+  }
+
+  function playShort(index) {
+    if (index >= 0 && index < shortsVideos.length) {
+      const short = shortsVideos[index];
+      shortsPlayer.innerHTML = `
+        <iframe 
+          width="100%" 
+          height="100%" 
+          src="https://www.youtube.com/embed/${short.id.videoId}?autoplay=1&mute=0"
+          frameborder="0"
+          allowfullscreen
+        ></iframe>
+      `;
+      currentShortIndex = index;
+    }
+  }
+
+  function handleSwipe(direction) {
+    if (direction === 'up' && currentShortIndex < shortsVideos.length - 1) {
+      playShort(currentShortIndex + 1);
+    } else if (direction === 'down' && currentShortIndex > 0) {
+      playShort(currentShortIndex - 1);
+    }
+  }
+
+  shortsPlayer.addEventListener('touchstart', (e) => {
+    touchStartY = e.touches[0].clientY;
+  });
+
+  shortsPlayer.addEventListener('touchend', (e) => {
+    touchEndY = e.changedTouches[0].clientY;
+    const deltaY = touchEndY - touchStartY;
+    
+    if (Math.abs(deltaY) > 50) { // Minimum swipe distance
+      if (deltaY > 0) {
+        handleSwipe('down');
+      } else {
+        handleSwipe('up');
+      }
+    }
+  });
+
+  // Add keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    if (shortsContainer.classList.contains('active')) {
+      if (e.key === 'ArrowUp') {
+        handleSwipe('down');
+      } else if (e.key === 'ArrowDown') {
+        handleSwipe('up');
+      }
+    }
+  });
+
+  shortsButton.addEventListener('click', async () => {
+    shortsContainer.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    await loadShorts();
+  });
+
+  // Update mobile shorts button handler
+  document.getElementById('mobile-shorts-button').addEventListener('click', async () => {
+    shortsContainer.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    await loadShorts();
+  });
+
+  closeShorts.addEventListener('click', () => {
+    shortsContainer.classList.remove('active');
+    document.body.style.overflow = '';
+    shortsPlayer.innerHTML = '';
+    currentShortIndex = 0;
+    shortsVideos = [];
+  });
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  // ... existing initialization code ...
+
+  const videos = await fetchVideos();
+  displayVideos(videos);
+  document.querySelector('.create-button').addEventListener('click', () => {
+    if (!isSignedIn) {
+      alert('Please sign in to create videos');
+      return;
+    }
+    showPage('create-page');
+  });
+  document.querySelector('.create-form').addEventListener('submit', e => {
+    e.preventDefault();
+    alert('Video upload functionality would be implemented here');
+    showPage('video-container');
+  });
+  document.querySelector('.logo').addEventListener('click', e => {
+    e.preventDefault();
+    showPage('video-container');
+  });
+  document.getElementById('profile-pic-input').addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        userData.profilePicture = e.target.result;
+        document.getElementById('profile-avatar').style.backgroundImage = `url(${userData.profilePicture})`;
+        const headerAvatar = signInButton.querySelector('.channel-avatar');
+        if (headerAvatar) {
+          headerAvatar.style.backgroundImage = `url(${userData.profilePicture})`;
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+  document.getElementById('username').addEventListener('change', e => {
+    userData.username = e.target.value;
+  });
+  document.getElementById('display-name').addEventListener('change', e => {
+    userData.displayName = e.target.value;
+  });
+  document.getElementById('channel-bio').addEventListener('change', e => {
+    userData.channelBio = e.target.value;
+  });
+  document.getElementById('profile-done').addEventListener('click', () => {
+    if (validateProfile()) {
+      showPage('video-container');
+    }
+  });
+  signInButton.addEventListener('click', e => {
+    if (isSignedIn && e.target.closest('.channel-avatar')) {
+      showPage('profile-page');
+      document.getElementById('username').value = userData.username;
+      document.getElementById('display-name').value = userData.displayName;
+      document.getElementById('channel-bio').value = userData.channelBio;
+      if (userData.profilePicture) {
+        document.getElementById('profile-avatar').style.backgroundImage = `url(${userData.profilePicture})`;
+      }
+      return;
+    }
+    handleSignIn();
+  });
+  // Add modal close handler
+  document.getElementById('close-modal').addEventListener('click', closeVideoModal);
+  
+  // Close modal when clicking outside the player
+  document.getElementById('video-modal').addEventListener('click', (e) => {
+    if (e.target.classList.contains('video-modal')) {
+      closeVideoModal();
+    }
+  });
+
+  // Handle escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && document.getElementById('video-modal').classList.contains('active')) {
+      closeVideoModal();
+    }
+  });
+
+  // Add bottom navigation handlers
+  document.getElementById('home-button').addEventListener('click', () => {
+    showPage('video-container');
+  });
+
+  document.getElementById('mobile-create-button').addEventListener('click', () => {
+    if (!isSignedIn) {
+      alert('Please sign in to create videos');
+      return;
+    }
+    showPage('create-page');
+  });
+
+  document.getElementById('mobile-profile-button').addEventListener('click', () => {
+    if (!isSignedIn) {
+      handleSignIn();
+      return;
+    }
+    showPage('profile-page');
+    document.getElementById('username').value = userData.username;
+    document.getElementById('display-name').value = userData.displayName;
+    document.getElementById('channel-bio').value = userData.channelBio;
+    if (userData.profilePicture) {
+      document.getElementById('profile-avatar').style.backgroundImage = `url(${userData.profilePicture})`;
+    }
+  });
+
+  initShorts();
+});
+
+let channelName = 'Channel Name';
+let userData = {
+  username: '',
+  displayName: '',
+  channelBio: '',
+  profilePicture: null
+};
+</script>
+
+</body>
+</html>
